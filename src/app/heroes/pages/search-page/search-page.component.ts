@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Heroe } from '../../interfaces/hero.interface';
+import { HeroesService } from '../../services/heroes.service';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-search-page',
@@ -6,6 +10,39 @@ import { Component } from '@angular/core';
   styles: [
   ]
 })
-export class SearchPageComponent {
+export class SearchPageComponent  implements OnInit{
+
+  public searchInput = new FormControl('');
+  public heroes: Heroe[] = [];
+  public selecteHero?:Heroe;
+  
+  constructor(
+    private heroesService : HeroesService
+  ){}
+  
+  ngOnInit(): void {
+    throw new Error('Method not implemented.');
+  }
+
+  searchHero(){
+    const value :string = this.searchInput.value || '';
+
+    this.heroesService.getSuggestions(value)
+      .subscribe(heroes => this.heroes = heroes );
+  }
+
+  onSelectedOption( event : MatAutocompleteSelectedEvent):void{
+    if (!event.option.value){
+      this.selecteHero = undefined
+      return;
+    }
+
+    const heroe: Heroe = event.option.value;
+    this.searchInput.setValue(heroe.superhero);
+
+    this.selecteHero = heroe;
+
+
+  }
 
 }
